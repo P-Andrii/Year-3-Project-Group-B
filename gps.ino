@@ -1,5 +1,5 @@
-// slightly modified code for the gps module from the library example
 // written by Andrii
+// slightly modified code for the gps module from the library example
 #include "SparkFun_Ublox_Arduino_Library.h"
 SFE_UBLOX_GPS myGPS;
 
