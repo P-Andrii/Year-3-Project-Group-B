@@ -1,3 +1,4 @@
+// written by Jody
 #define SensorPin A5 //pH meter Analog output to Arduino Analog Input 0
 #define Offset 0.00 //deviation compensate
 #define LED 13
