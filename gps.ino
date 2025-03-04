@@ -3,7 +3,7 @@
 #include "SparkFun_Ublox_Arduino_Library.h"
 SFE_UBLOX_GPS myGPS;
 
-long Timer = 0;
+long lastTime = 0;
 
 void setup()
 {
