@@ -55,7 +55,7 @@ double avergearray(int* arr, int number){
     if(arr[0]<arr[1]){
       min = arr[0];max=arr[1];
     }
-    else{now
+    else{
       min=arr[1];max=arr[0];
     }
     for(i=2;i<number;i++){
