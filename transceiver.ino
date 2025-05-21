@@ -3,15 +3,16 @@
 #include <SPI.h>
 #include "RF24.h"
 
-RF24 radio(9,10);
+RF24 radio(9, 10);
 
 byte address[][6] = {"1Node","2Node","3Node","4Node","5Node","6Node"};
-bool transmitter = 0; // a boolean indicating whether this module is a transmitter (1) or a receiver (0)
+bool transmitter = 1; // a boolean indicating whether this module is a transmitter (1) or a receiver (0)
 byte pipeNo, gotByte;
-byte counter;
+int counter, input_data, data[2];
 
 void setup(){
   Serial.begin(9600);
+  data[0] = 2; data[1] = 4;
   radio.begin();
   radio.setAutoAck(1); // Automatically acknowledge received messages
   radio.setRetries(0,15);  // Time between and number of attempts of sending a message
@@ -28,21 +29,23 @@ void setup(){
   radio.powerUp();
   if (transmitter){radio.stopListening();}
   else{radio.startListening();}
+  
 }
 
 void loop(void) {
   if (transmitter){
-    Serial.print("Sent: "); Serial.println(counter);
-    radio.write(&counter, sizeof(counter));
-    counter++;
+    Serial.print("Sending: "); Serial.print(data[0]), Serial.println(data[1]);
+    radio.write(&data, sizeof(data));
+    data[0] += 1;
+    data[1] += 1;
     delay(10);
     
   }
   else{
     while( radio.available(&pipeNo)){
-      radio.read( &gotByte, sizeof(gotByte) );
+      radio.read( &data, sizeof(data) );
 
-      Serial.print("Recieved: "); Serial.println(gotByte);
+      Serial.print("Recieved: "); Serial.print(data[0]); Serial.println(data[1]);
     }
   }
 }
