@@ -1,3 +1,4 @@
+# Written by Andrii
 import serial
 from time import sleep
 import arcade
