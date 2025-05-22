@@ -29,11 +29,11 @@ void loop()
   {
     lastTime = millis(); //Update the timer
     
-    long latitude = myGPS.getLatitude()/ 10000000;
+    long latitude = myGPS.getLatitude();
     Serial.print(F("Lat: "));
     Serial.print(latitude);
 
-    long longitude = myGPS.getLongitude()/10000000;
+    long longitude = myGPS.getLongitude();
     Serial.print(F(" Long: "));
     Serial.print(longitude);
     Serial.print(F(" (degrees)"));
