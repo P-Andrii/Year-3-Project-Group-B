@@ -7,7 +7,7 @@ long lastTime = 0;
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while (!Serial); //Wait for user to open terminal
   Serial.println("SparkFun Ublox Example");
 
