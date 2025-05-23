@@ -1,17 +1,22 @@
 // written by Andrii
-// NRF24L01 data sending/receiving, adapted from the example code from the NRF24L01 library
-#include <SPI.h>
+// slightly modified code for the gps module from the library example
 #include "RF24.h"
+RF24 radio(10, 9);
 
-RF24 radio(9, 10);
-
+// radio stuff
 byte address[][6] = {"1Node","2Node","3Node","4Node","5Node","6Node"};
 bool transmitter = 1; // a boolean indicating whether this module is a transmitter (1) or a receiver (0)
 byte pipeNo, gotByte;
-int counter, input_data, data[8];
+double package_number, data[7];
 
-void setup(){
+void setup()
+{
   Serial.begin(9600);
+  setup_radio();
+
+}
+
+void setup_radio(){
   radio.begin();
   radio.setAutoAck(1); // Automatically acknowledge received messages
   radio.setRetries(0,15);  // Time between and number of attempts of sending a message
@@ -28,40 +33,40 @@ void setup(){
   radio.powerUp();
   if (transmitter){radio.stopListening();}
   else{radio.startListening();}
-  
 }
 
-void loop(void) {
-  if (transmitter){
-    Serial.print("Sending: "); Serial.print(data[0]), Serial.println(data[1]);
-    radio.write(&data, sizeof(data));
-    data[0] += 1;
-    data[1] += 1;
-    delay(10);
-    
-  }
-  else{
-    while( radio.available(&pipeNo)){
-      radio.read( &data, sizeof(data) );
+void send_data(long latitude_, long longitude_, float angle_, float winch_status_, float pH_, float turn_angle_){
+  //debug data
+  Serial.print("Sending... ");
+  Serial.print("  Longitude: ");
+  Serial.print(latitude_);
+  Serial.print("  Latitude: ");
+  Serial.print(longitude_);
+  Serial.print("  Angle: ");
+  Serial.print(angle_);
+  Serial.print("  Winch: ");
+  Serial.print(winch_status_);
+  Serial.print("  pH: ");
+  Serial.println(pH_);
 
-      Serial.print("Recieved: ");
-      Serial.print(data[0]);
-      Serial.print("   ");
-      Serial.print(data[1]);
-      Serial.print("   ");
-      Serial.print(data[2]);
-      Serial.print("   ");
-      Serial.print(data[3]);
-      Serial.print("   ");
-      Serial.print(data[4]);
-      Serial.print("   ");
-      Serial.print(data[5]);
-      Serial.print("   ");
-      Serial.print(data[6]);
-      Serial.print("   ");
-      Serial.print(data[7]);
-      Serial.print("   ");
-      Serial.println(data[8]);
-    }
+  //setting up the array
+  data[0] += 1;
+  data[1] = latitude_;
+  data[2] = longitude_;
+  data[3] = angle_;
+  data[4] = winch_status_;
+  data[5] = pH_;
+  data[6] = turn_angle_;
+
+  // transmitting the array
+  radio.write(&data, sizeof(data));
+}
+
+void loop()
+{
+  if (millis() - lastTime > 1000)
+  {
+    // data = [latitude, longitude, angle, winch status, pH, turn_angle]
+    send_data(536719842, -158127524, 120.1, 1.0, 7.0, 17.0);
   }
 }
