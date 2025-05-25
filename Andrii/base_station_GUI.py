@@ -19,6 +19,8 @@ scale_position_2 = [470, 95]
 points_of_interest = []
 boat_data = [] 
 package_size = 7
+packages = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] # rolling array of 10 most recent package ids to detect packages lost in transmission
+signal_strength = 0 # signal strength, shown as a percentage will technically be above 100% for the first 10 packages 
 
 def pixels_to_degrees(x, y):
     dx = x - scale_position_1[0]
@@ -41,13 +43,19 @@ def degrees_to_pixels(latitude, longitude):
 def boat_signal():
     global boat_data
     # Boat Data: [package_number, longitude, latitude, rotation, winch_status, temperature, Ph]
-    """boat_data = list(str(port.readline())[2:][:-5].split())
+    boat_data = list(str(port.readline())[2:][:-5].split())
     if len(boat_data) == package_size:
         for i in range(len(boat_data)):
             boat_data[i] = float(boat_data[i])
         boat_data[1] = boat_data[1]/10000000
-        boat_data[2] = boat_data[2]/10000000"""
-    boat_data = [17, 53.9466222, -1.0281674, 105.0, 0, 17.6, 7.1] # fake values for testing without the need of an arduino
+        boat_data[2] = boat_data[2]/10000000
+    # boat_data = [17, 53.9466222, -1.0281674, 105.0, 0, 17.6, 7.1] # fake values for testing without the need of an arduino
+
+    # detect missing packages
+    for i in len(packages)-1:
+        packages[i] = packages[i+1]
+    packages[len(packages)] = boat_data[0]
+    signal_strength = int(1000/(packages[len(packages)] - packages[0])) # signal_strength shown as a percentage of packages that arrived compared to lost
     sleep(0.1)
 
 
@@ -105,6 +113,12 @@ class MyGame(arcade.Window):
 
             arcade.draw_text(f"Ph:", 20, 530, color=AIR_SUPERIORITY_BLUE, font_size=14, bold=True)
             arcade.draw_text(f" {boat_data[6]}", 150, 530, color=AIR_SUPERIORITY_BLUE, font_size=14, bold=True)
+
+            arcade.draw_text(f"Package Number:", 20, 515, color=AIR_SUPERIORITY_BLUE, font_size=14, bold=True)
+            arcade.draw_text(f" {boat_data[0}", 150, 515, color=AIR_SUPERIORITY_BLUE, font_size=14, bold=True)
+
+            arcade.draw_text(f"Signal Strength:", 20, 500, color=AIR_SUPERIORITY_BLUE, font_size=14, bold=True)
+            arcade.draw_text(f" {signal_strength}", 150, 500, color=AIR_SUPERIORITY_BLUE, font_size=14, bold=True)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         global points_of_interest
